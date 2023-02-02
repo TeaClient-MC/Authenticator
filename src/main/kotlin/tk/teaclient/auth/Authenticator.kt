@@ -64,7 +64,7 @@ class Authenticator(
 
     private fun onLogin(req: String): String {
         val code = getCode(req)
-        println(code)
+
         return "<p> welcome </p>"
     }
 
