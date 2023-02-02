@@ -2,6 +2,8 @@ package tk.teaclient.auth
 
 import com.google.gson.Gson
 import org.apache.http.HttpEntity
+import org.apache.http.NameValuePair
+import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClientBuilder
@@ -42,6 +44,48 @@ object HTTPUtils {
         client.close()
 
         // json to class
-        return gson.fromJson<T>(content, clazz)
+        return gson.fromJson(content, clazz)
     }
+    /**
+     * Make GET request to server
+     *
+     * @param url to get on
+     * @param obj params of get req
+     * @param clazz Class to deserialize to
+     */
+    fun <T : Any> get(url: String, params: List<NameValuePair>, clazz: Class<T>, headers: Map<String, String>): T {
+        // create json serializer/deserializer
+        val gson = Gson()
+
+        // create get request
+        val get = HttpGet(buildString {
+            this.append(url)
+
+            for((index, pair) in params.withIndex()) {
+                if(index == 0)
+                    this.append("?")
+                else
+                    this.append("&")
+
+                this.append("${pair.name}=${pair.value}")
+            }
+        })
+
+
+        // create http client to make request
+        val client = HttpClientBuilder.create().build()!!
+
+        // make get to server
+        val response = client.execute(get)
+
+        // get content as input stream and convert it to string
+        val content = response.entity.content.string()
+
+        // close client
+        client.close()
+
+        // json to class
+        return gson.fromJson(content, clazz)
+    }
+
 }
