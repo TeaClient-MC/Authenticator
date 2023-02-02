@@ -18,12 +18,13 @@
 
 package tk.teaclient.auth.server
 
-import com.sun.net.httpserver.*
-import tk.teaclient.auth.*
+import tk.teaclient.auth.logger
+import tk.teaclient.auth.url
 import java.awt.Desktop
-import java.io.*
-import java.net.*
-import kotlin.random.*
+import java.net.ServerSocket
+import java.net.Socket
+import java.net.URL
+import kotlin.random.Random
 
 
 /**
@@ -32,7 +33,8 @@ import kotlin.random.*
  */
 class LoginServer(
     private val clientID: String,
-    private val port: Int = Random.Default.nextInt(10000)) {
+    private val port: Int = Random.Default.nextInt(10000)
+) {
 
     val url: URL
         get() = ("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize" +
@@ -77,18 +79,20 @@ class LoginServer(
         socket.use {
             it.getInputStream().use { inputStream ->
                 val line = inputStream.bufferedReader().readLine()
-                println(line)
                 it.getOutputStream().apply {
                     val os = this
-
-                    val response = "<html><body>Hello, World!</body></html>"
-
+                    var response = ""
+                    // ughhh
+                    if (this@LoginServer::handleFunction.isInitialized) {
+                        response += this@LoginServer.handleFunction.invoke(line)
+                    }
                     os.write(
                         ("HTML/1.1 200 OK \r\n" +
                                 "Content-Type: text/html; charset=UTF-8\r\n" +
                                 "Content-Length: ${response.length}\r\n\r\n")
                             .toByteArray()
                     )
+
                     os.write(response.toByteArray())
                     os.flush()
                     os.close()

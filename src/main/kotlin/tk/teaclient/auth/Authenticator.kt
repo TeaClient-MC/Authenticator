@@ -55,11 +55,22 @@ class Authenticator(
     private fun startServer(): MinecraftSessionResult {
 
         val server = LoginServer(clientID)
+        server.handle(this::onLogin)
         server.start()
 
-
-
+        // just to return smth
         return MinecraftSessionResult("", UUID.randomUUID(), "")
+    }
+
+    private fun onLogin(req: String): String {
+        val code = getCode(req)
+        println(code)
+        return "<p> welcome </p>"
+    }
+
+    private fun getCode(req: String): String {
+        // ughhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+        return req.split("=")[1].split(" ")[0]
     }
 
 }
