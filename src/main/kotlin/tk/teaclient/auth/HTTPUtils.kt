@@ -71,6 +71,9 @@ object HTTPUtils {
             }
         })
 
+        for(header in headers) {
+            get.setHeader(header.key, header.value)
+        }
 
         // create http client to make request
         val client = HttpClientBuilder.create().build()!!
