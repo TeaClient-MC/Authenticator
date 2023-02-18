@@ -26,16 +26,17 @@ import java.net.Socket
 import java.net.URL
 import kotlin.random.Random
 
-
 /**
- * Login Server
- * @param port Port of Login Server
+ * Login Server class for Microsoft authentication
+ *
+ * @property clientID Application ClientID to use for authentication
+ * @property port Port number of the login server. A random port is used by default.
  */
 class LoginServer(
     private val clientID: String,
     private val port: Int = Random.Default.nextInt(10000)
 ) {
-
+    /** URL of the login page for Microsoft authentication */
     val url: URL
         get() = ("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize" +
                 "?client_id=$clientID" +
@@ -44,28 +45,31 @@ class LoginServer(
                 "&response_type=code").url()
 
     /**
-     * REQ => RES
+     * The function to handle incoming login requests.
+     * The function takes in a request string and returns a response string.
      */
     private lateinit var handleFunction: (String) -> String
 
-
-    /* Server stuff */
-
+    /** The server socket used to listen for incoming login requests. */
     private lateinit var serverSocket: ServerSocket
+
+    /** The socket for the incoming login request. */
     private lateinit var socket: Socket
 
-
     /**
-     * Sets handle function,
-     * handle function is called when someone connects to the server.
+     * Sets the function to handle incoming login requests.
+     * The function takes in a request string and returns a response string.
+     *
+     * @param function the function to handle incoming login requests.
      */
     fun handle(function: (String) -> String) {
         this.handleFunction = function
     }
 
-
     /**
-     * Starts login server
+     * Starts the login server and waits for incoming login requests.
+     *
+     * @return the current [LoginServer] instance.
      */
     fun start(): LoginServer {
         logger.info("Starting server on $port")
@@ -73,33 +77,30 @@ class LoginServer(
         Desktop.getDesktop().browse(url.toURI())
         socket = serverSocket.accept()
 
-
-        // waits till someone connects :)
-
+        // Waits until a client connects.
         socket.use {
             it.getInputStream().use { inputStream ->
                 val line = inputStream.bufferedReader().readLine()
                 it.getOutputStream().apply {
                     val os = this
                     var response = ""
-                    // ughhh
+                    // Calls the handle function to generate a response.
                     if (this@LoginServer::handleFunction.isInitialized) {
                         response += this@LoginServer.handleFunction.invoke(line)
                     }
+                    // Writes the response to the client.
                     os.write(
-                        ("HTML/1.1 200 OK \r\n" +
+                        ("HTTP/1.1 200 OK\r\n" +
                                 "Content-Type: text/html; charset=UTF-8\r\n" +
                                 "Content-Length: ${response.length}\r\n\r\n")
                             .toByteArray()
                     )
-
                     os.write(response.toByteArray())
                     os.flush()
                     os.close()
                 }
             }
         }
-
         return this
     }
 }

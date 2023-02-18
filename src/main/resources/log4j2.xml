@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Appenders>
+        <!-- Define a console appender that writes to standard output (i.e., the console). -->
         <Console name="Console" target="SYSTEM_OUT">
+
+            <!-- Define the format of the log messages using a pattern layout.
+                 In this example, we use a pattern that includes placeholders for the time of the log message (%d),
+                 the log level (%level), and the log message (%msg).
+                 We also use the highlight plugin to add color to the log messages.
+                 The highlight plugin supports several color schemes; in this example, we use the default scheme. -->
             <PatternLayout pattern="[%d{HH:mm:ss}] [%level] %msg%n"/>
         </Console>
     </Appenders>
+
     <Loggers>
+        <!-- Set the log level for the root logger to 'info'.
+             This means that log messages with a log level of 'info' or higher (i.e., 'warn' and 'error')
+             will be sent to the console appender defined above. -->
         <Root level="info">
             <AppenderRef ref="Console"/>
         </Root>

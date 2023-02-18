@@ -19,33 +19,21 @@ package tk.teaclient.auth.jsonobjects.res
 
 import com.google.gson.annotations.SerializedName
 
+/**
+ * Represents a response from the Minecraft authentication server, containing information about
+ * the authenticated user.
+ *
+ * @property username The username of the authenticated user.
+ * @property roles A list of roles assigned to the authenticated user.
+ * @property accessToken The access token associated with the authenticated user.
+ * @property tokenType The type of the access token associated with the authenticated user.
+ * @property expiresIn The number of seconds until the access token associated with the authenticated
+ *                     user expires.
+ */
 data class MinecraftRes(
     @field:SerializedName("username") val username: String,
-    @field:SerializedName("roles") val roles: Array<*>,
+    @field:SerializedName("roles") val roles: List<*>,
     @field:SerializedName("access_token") val accessToken: String,
     @field:SerializedName("token_type") val tokenType: String,
     @field:SerializedName("expires_in") val expiresIn: Long
-) {
-    override fun equals(other: Any?): Boolean {
-        if(other == null) return false
-        if (this === other) return true
-        if (other !is MinecraftRes) return false
-
-        if (username != other.username) return false
-        if (!roles.contentEquals(other.roles)) return false
-        if (accessToken != other.accessToken) return false
-        if (tokenType != other.tokenType) return false
-        if (expiresIn != other.expiresIn) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = username.hashCode()
-        result = 31 * result + roles.contentHashCode()
-        result = 31 * result + accessToken.hashCode()
-        result = 31 * result + tokenType.hashCode()
-        result = 31 * result + expiresIn.hashCode()
-        return result
-    }
-}
+)

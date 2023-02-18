@@ -17,8 +17,17 @@
 */
 package tk.teaclient.auth.service
 
-import tk.teaclient.auth.*
+import tk.teaclient.auth.MinecraftSessionResult
 
+/**
+ * Defines an interface for classes that provide a way to change the current session
+ * for a Minecraft account.
+ */
 interface SessionChangerProvider {
+
+    /**
+     * Changes the current session for a Minecraft account to the provided session result.
+     * @param sessionResult The new session result to use for the Minecraft account.
+     */
     fun changeSession(sessionResult: MinecraftSessionResult)
 }

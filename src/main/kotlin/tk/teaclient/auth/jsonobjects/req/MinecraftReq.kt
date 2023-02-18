@@ -19,4 +19,10 @@ package tk.teaclient.auth.jsonobjects.req
 
 import com.google.gson.annotations.SerializedName
 
-data class MinecraftReq(@field:SerializedName("identityToken") val identityToken: String)
+/**
+ * Data class representing a Minecraft login request object.
+ * @property identityToken The identity token for the user attempting to log in.
+ */
+data class MinecraftReq(
+    @field:SerializedName("identityToken") val identityToken: String
+)

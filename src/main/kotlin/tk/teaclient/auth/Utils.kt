@@ -20,9 +20,25 @@ package tk.teaclient.auth
 import java.io.InputStream
 import java.net.URL
 
+/*
+ * A collection of extension functions for working with input streams and URLs related to authentication.
+ */
+
+/**
+ * Reads the contents of the input stream and returns it as a string.
+ *
+ * @return The contents of the input stream as a string.
+ */
 fun InputStream.string(): String {
     return String(this.readAllBytes())
 }
+
+/**
+ * Converts this string to a URL object.
+ *
+ * @return A URL object that represents this string.
+ */
 fun String.url(): URL {
     return URL(this)
 }
+

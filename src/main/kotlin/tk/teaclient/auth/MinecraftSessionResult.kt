@@ -21,10 +21,11 @@ import com.google.gson.annotations.SerializedName
 import java.util.*
 
 /**
- * Result of Microsoft Login,
- * @param username Username
- * @param uuid UUID of user, mapped to [UUID]
- * @param token Token of user
+ * Represents the result of a successful Microsoft login to Minecraft.
+ *
+ * @param username The username of the authenticated user.
+ * @param uuid The UUID of the authenticated user.
+ * @param token The access token of the authenticated user.
  */
 data class MinecraftSessionResult(
     @field:SerializedName("username") val username: String,

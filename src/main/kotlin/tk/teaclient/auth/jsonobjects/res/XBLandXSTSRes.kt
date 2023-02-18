@@ -19,6 +19,14 @@ package tk.teaclient.auth.jsonobjects.res
 
 import com.google.gson.annotations.SerializedName
 
+/**
+ * Represents a response from Microsoft Xbox Live and Xbox Secure Token Service (XBL and XSTS).
+ *
+ * @property issueInstant The time when the token was issued, in ISO 8601 format.
+ * @property notAfter The time when the token will expire, in ISO 8601 format.
+ * @property token The token string.
+ * @property displayClaims The display claims associated with the token.
+ */
 data class XBLandXSTSRes(
     @field:SerializedName("IssueInstant") val issueInstant: String,
     @field:SerializedName("NotAfter") val notAfter: String,
@@ -26,19 +34,16 @@ data class XBLandXSTSRes(
     @field:SerializedName("DisplayClaims") val displayClaims: DisplayClaims
 )
 
-data class DisplayClaims(@field:SerializedName("xui") val xui: Array<XUI>) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is DisplayClaims) return false
+/**
+ * Represents the display claims associated with a Microsoft Xbox Live and Xbox Secure Token Service (XBL and XSTS) token.
+ *
+ * @property xui The list of Xbox User IDs (XUIs) associated with the token.
+ */
+data class DisplayClaims(@field:SerializedName("xui") val xui: List<XUI>)
 
-        if (!xui.contentEquals(other.xui)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return xui.contentHashCode()
-    }
-}
-
+/**
+ * Represents a Microsoft Xbox User ID (XUI).
+ *
+ * @property uhs The user hash string associated with the XUI.
+ */
 data class XUI(@field:SerializedName("uhs") val uhs: String)

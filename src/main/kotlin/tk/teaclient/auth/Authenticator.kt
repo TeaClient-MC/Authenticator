@@ -14,63 +14,91 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-package tk.teaclient.auth
+*/package tk.teaclient.auth
 
 import org.apache.logging.log4j.LogManager
-import tk.teaclient.auth.server.*
-import tk.teaclient.auth.service.*
-import java.net.URL
+import tk.teaclient.auth.server.LoginServer
+import tk.teaclient.auth.service.SessionChangerProvider
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
+/**
+ * The [LogManager] logger object used to log messages to the console.
+ */
 val logger = LogManager.getLogger()!!
 
-
 /**
- * Authenticator class, it provides ability to log in to your microsoft account
- * @param clientID Application ClientID, it should provide localhost Redirect URI
- * @param changeSession Changes minecraft session if [SessionChangerProvider] is provided
- * @param logging Logs messages to console
+ * The `Authenticator` class provides the ability to log in to a Microsoft account and obtain a Minecraft session.
+ *
+ * @param clientID The Application Client ID, which should provide a localhost Redirect URI.
+ * @param changeSession If true, changes the Minecraft session using a `SessionChangerProvider` object.
+ * @param logging If true, logs messages to the console.
  */
 class Authenticator(
     private val clientID: String,
     private val changeSession: Boolean = false,
     val logging: Boolean = false
 ) {
-
+    /**
+     * The [ServiceLoader] object used to load a [SessionChangerProvider] object, which is used to change the Minecraft session.
+     */
     private val serviceLoader = ServiceLoader.load(SessionChangerProvider::class.java)
+
+    /**
+     * The [SessionChangerProvider] object, loaded using the [serviceLoader] object.
+     */
     private val sessionChangerProvider = serviceLoader.findFirst().orElse(null)
 
 
-
     /**
-     * Starts login server on port: [LoginServer.port] (Randomly generated till: 10000)
-     * @return Result of login
+     * Starts the login server on a randomly generated port, and returns a [CompletableFuture] that will contain
+     * the [MinecraftSessionResult] when the login is complete.
+     *
+     * @return A [CompletableFuture] that will contain the [MinecraftSessionResult] when the login is complete.
      */
     fun login(): CompletableFuture<MinecraftSessionResult> {
         return CompletableFuture<MinecraftSessionResult>().completeAsync(this::startServer)
     }
 
+    /**
+     * Starts the login server and returns a dummy [MinecraftSessionResult] object.
+     *
+     * @return A dummy [MinecraftSessionResult] object.
+     */
     private fun startServer(): MinecraftSessionResult {
-
+        // Start the login server.
         val server = LoginServer(clientID)
         server.handle(this::onLogin)
         server.start()
 
-        // just to return smth
+        // Return a dummy MinecraftSessionResult object to satisfy the return type of the CompletableFuture.
         return MinecraftSessionResult("", UUID.randomUUID(), "")
     }
 
-    private fun onLogin(req: String): String {
-        val code = getCode(req)
-
-        return "<p> welcome </p>"
-    }
-
+    /**
+     * Parses the authentication code from the Microsoft account login request.
+     *
+     * @param req The login request as a string.
+     * @return The authentication code as a string.
+     */
     private fun getCode(req: String): String {
-        // ughhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+        // The login request is in the format "GET /?code=<auth_code> HTTP/1.1", so we split it by "=" and return the second part.
         return req.split("=")[1].split(" ")[0]
     }
 
+    /**
+     * Handles the login request from the Microsoft account.
+     *
+     * @param req The login request as a string.
+     * @return The response HTML as a string.
+     */
+    private fun onLogin(req: String): String {
+        // Parse the authentication code from the login request.
+        val code = getCode(req)
+
+        // TODO: Implement actual login logic here.
+
+        // Return a welcome message to the user.
+        return "<p>Welcome!</p>"
+    }
 }

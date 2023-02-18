@@ -19,29 +19,26 @@ package tk.teaclient.auth.jsonobjects.req
 
 import com.google.gson.annotations.SerializedName
 
+/**
+ * Request object used for obtaining XSTS tokens.
+ *
+ * @property properties The properties of the request.
+ * @property relyingParty The relying party of the request.
+ * @property tokenType The token type of the request.
+ */
 data class XSTSReq(
     @field:SerializedName("Properties") val properties: XSTSProperties,
     @field:SerializedName("RelyingParty") val relyingParty: String = "rp://api.minecraftservices.com/",
     @field:SerializedName("TokenType") val tokenType: String = "JWT"
 )
 
+/**
+ * The properties of an XSTS token request.
+ *
+ * @property sandboxId The sandbox ID of the request.
+ * @property userTokens The user tokens of the request.
+ */
 data class XSTSProperties(
     @field:SerializedName("SandboxId") val sandboxId: String = "RETAIL",
-    @field:SerializedName("UserTokens") val userTokens: Array<String>
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is XSTSProperties) return false
-
-        if (sandboxId != other.sandboxId) return false
-        if (!userTokens.contentEquals(other.userTokens)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = sandboxId.hashCode()
-        result = 31 * result + userTokens.contentHashCode()
-        return result
-    }
-}
+    @field:SerializedName("UserTokens") val userTokens: List<String>
+)
