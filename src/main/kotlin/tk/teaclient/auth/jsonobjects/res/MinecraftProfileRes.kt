@@ -39,10 +39,12 @@ data class MinecraftProfileRes(
      * @property id The ID of the cape.
      * @property state The state of the cape.
      * @property url The URL of the cape.
+     * @property alias The alias of the cape.
      */
     data class Cape(
         @field:SerializedName("id") val id: String,
         @field:SerializedName("state") val state: String,
-        @field:SerializedName("url") val url: String
+        @field:SerializedName("url") val url: String,
+        @field:SerializedName("alias") val alias: String
     )
 }

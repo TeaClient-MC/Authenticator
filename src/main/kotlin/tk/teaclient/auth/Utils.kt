@@ -17,7 +17,9 @@
 */
 package tk.teaclient.auth
 
+import java.io.BufferedReader
 import java.io.InputStream
+import java.io.InputStreamReader
 import java.net.URL
 
 /*
@@ -30,7 +32,14 @@ import java.net.URL
  * @return The contents of the input stream as a string.
  */
 fun InputStream.string(): String {
-    return String(this.readAllBytes())
+    val bufferedReader = BufferedReader(InputStreamReader(this))
+    val stringBuilder = StringBuilder()
+    var line: String? = bufferedReader.readLine()
+    while (line != null) {
+        stringBuilder.append(line)
+        line = bufferedReader.readLine()
+    }
+    return stringBuilder.toString()
 }
 
 /**
@@ -38,7 +47,7 @@ fun InputStream.string(): String {
  *
  * @return A URL object that represents this string.
  */
-fun String.url(): URL {
+inline fun String.url(): URL {
     return URL(this)
 }
 

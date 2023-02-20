@@ -1,106 +1,84 @@
 package tk.teaclient.auth
 
 import com.google.gson.Gson
-import org.apache.http.HttpEntity
-import org.apache.http.NameValuePair
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.entity.StringEntity
-import org.apache.http.impl.client.HttpClientBuilder
+import okhttp3.FormBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.IOException
 
 /**
  * A utility object for making HTTP requests.
  */
 object HTTPUtils {
 
-    /**
-     * Makes a POST request to the server.
-     *
-     * @param url The URL to post on.
-     * @param obj The content of the post request.
-     * @param clazz The class to deserialize the response to.
-     * @return The deserialized response.
-     */
-    fun <T : Any> post(url: String, obj: Any, clazz: Class<T>): T {
-        // Create a JSON serializer/deserializer.
-        val gson = Gson()
+    val client = OkHttpClient()
 
-        // Create a POST request.
-        val post = HttpPost(url)
+    val gson = Gson()
 
-        // Set the content of the request.
-        if (obj is HttpEntity) {
-            post.entity = obj
-        } else {
-            post.entity = StringEntity(gson.toJson(obj))
+    @Throws(IOException::class)
+    inline fun <reified T : Any> post(url: String, obj: Any): T? {
+        val json = gson.toJson(obj)
+        val body = json.toRequestBody("application/json".toMediaTypeOrNull())
+
+        val request = Request.Builder().url(url).post(body).build()
+
+        val response = client.newCall(request).execute()
+
+        if (!response.isSuccessful) {
+            throw IOException("Unexpected code $response")
         }
 
-        // Create an HTTP client to make the request.
-        val client = HttpClientBuilder.create().build()!!
-
-        // Make a POST request to the server.
-        val response = client.execute(post)
-
-        // Get the content as an input stream and convert it to a string.
-        val content = response.entity.content.string()
-
-        // Close the HTTP client.
-        client.close()
-
-        // Deserialize the response from JSON to the specified class.
-        return gson.fromJson(content, clazz)
+        return gson.fromJson(response.body?.string(), T::class.java)
     }
 
-    /**
-     * Makes a GET request to the server.
-     *
-     * @param url The URL to get on.
-     * @param params The parameters of the GET request.
-     * @param clazz The class to deserialize the response to.
-     * @param headers The headers to include in the GET request.
-     * @return The deserialized response.
-     */
-    fun <T : Any> get(
-        url: String,
-        params: List<NameValuePair>,
-        clazz: Class<T>,
-        headers: Map<String, String>
-    ): T {
-        // Create a JSON serializer/deserializer.
-        val gson = Gson()
+    @Throws(IOException::class)
+    inline fun <reified T : Any> post(url: String, params: Map<String, String>): T? {
+        val formBodyBuilder = FormBody.Builder()
+        params.forEach { (key, value) -> formBodyBuilder.add(key, value) }
+        val formBody = formBodyBuilder.build()
 
-        // Create a GET request.
-        val get = HttpGet(buildString {
-            this.append(url)
+        val request = Request.Builder().url(url).post(formBody).build()
 
-            for ((index, pair) in params.withIndex()) {
-                if (index == 0)
-                    this.append("?")
-                else
-                    this.append("&")
+        val response = client.newCall(request).execute()
 
-                this.append("${pair.name}=${pair.value}")
+        if (!response.isSuccessful) {
+            throw IOException("Unexpected code $response")
+        }
+
+        return gson.fromJson(response.body?.string(), T::class.java)
+    }
+
+
+    @Throws(IOException::class)
+    inline fun <reified T : Any> get(url: String, headers: Map<String, String> = mapOf(), params: Map<String, String> = mapOf()): T? {
+        val urlBuilder = StringBuilder(url)
+
+        if (params.isNotEmpty()) {
+            urlBuilder.append("?")
+            params.entries.forEachIndexed { index, (key, value) ->
+                urlBuilder.append("$key=$value")
+                if (index < params.size - 1) {
+                    urlBuilder.append("&")
+                }
             }
-        })
-
-        // Set the headers of the request.
-        for (header in headers) {
-            get.setHeader(header.key, header.value)
         }
 
-        // Create an HTTP client to make the request.
-        val client = HttpClientBuilder.create().build()!!
+        val requestBuilder = Request.Builder().url(urlBuilder.toString())
+        headers.forEach { (key, value) -> requestBuilder.addHeader(key, value) }
+        val request = requestBuilder.build()
 
-        // Make a GET request to the server.
-        val response = client.execute(get)
+        val response = client.newCall(request).execute()
 
-        // Get the content as an input stream and convert it to a string.
-        val content = response.entity.content.string()
+        val body = response.body?.string()
 
-        // Close the HTTP client.
-        client.close()
 
-        // Deserialize the response from JSON to the specified class.
-        return gson.fromJson(content, clazz)
+        if (!response.isSuccessful) {
+            throw IOException("Unexpected code $response")
+        }
+
+        return gson.fromJson(body, T::class.java)
     }
+
 }

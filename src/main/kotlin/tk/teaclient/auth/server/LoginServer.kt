@@ -15,92 +15,95 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 package tk.teaclient.auth.server
 
+import tk.teaclient.auth.MinecraftSessionResult
 import tk.teaclient.auth.logger
 import tk.teaclient.auth.url
 import java.awt.Desktop
 import java.net.ServerSocket
-import java.net.Socket
 import java.net.URL
 import kotlin.random.Random
 
 /**
- * Login Server class for Microsoft authentication
+ * A server used to handle authentication flow for Minecraft authentication using Xbox Live.
  *
- * @property clientID Application ClientID to use for authentication
- * @property port Port number of the login server. A random port is used by default.
+ * @property clientID The client ID to use for authentication flow.
+ * @property port The port number to use for the server. Defaults to a random port.
  */
-class LoginServer(
-    private val clientID: String,
-    private val port: Int = Random.Default.nextInt(10000)
-) {
-    /** URL of the login page for Microsoft authentication */
+class LoginServer(private val clientID: String, internal val port: Int = Random.Default.nextInt(10000)) {
+
+    /**
+     * The URL to use for initiating the authentication flow.
+     */
     val url: URL
-        get() = ("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize" +
-                "?client_id=$clientID" +
-                "&scope=XboxLive.signin" +
-                "&redirect_uri=http://localhost:$port" +
-                "&response_type=code").url()
+        get() = ("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=$clientID&scope=XboxLive.signin%20offline_access&redirect_uri=http://localhost:$port&response_type=code").url()
+
+    private lateinit var handleFunction: (String) -> MinecraftSessionResult
 
     /**
-     * The function to handle incoming login requests.
-     * The function takes in a request string and returns a response string.
-     */
-    private lateinit var handleFunction: (String) -> String
-
-    /** The server socket used to listen for incoming login requests. */
-    private lateinit var serverSocket: ServerSocket
-
-    /** The socket for the incoming login request. */
-    private lateinit var socket: Socket
-
-    /**
-     * Sets the function to handle incoming login requests.
-     * The function takes in a request string and returns a response string.
+     * Sets a handler function to be called when an authentication code is received.
      *
-     * @param function the function to handle incoming login requests.
+     * @param handler The function to handle authentication codes.
      */
-    fun handle(function: (String) -> String) {
-        this.handleFunction = function
+    fun handle(handler: (String) -> MinecraftSessionResult) {
+        this.handleFunction = handler
     }
 
     /**
-     * Starts the login server and waits for incoming login requests.
-     *
-     * @return the current [LoginServer] instance.
+     * Starts the server and initiates the authentication flow.
      */
-    fun start(): LoginServer {
+    fun start() = run {
         logger.info("Starting server on $port")
-        serverSocket = ServerSocket(port)
-        Desktop.getDesktop().browse(url.toURI())
-        socket = serverSocket.accept()
+        val serverSocket = ServerSocket(port)
+        if(Desktop.isDesktopSupported())
+            Desktop.getDesktop().browse(url.toURI())
+        lateinit var result: MinecraftSessionResult
+        while (true) {
+            val socket = serverSocket.accept()
 
-        // Waits until a client connects.
-        socket.use {
-            it.getInputStream().use { inputStream ->
-                val line = inputStream.bufferedReader().readLine()
-                it.getOutputStream().apply {
-                    val os = this
-                    var response = ""
-                    // Calls the handle function to generate a response.
-                    if (this@LoginServer::handleFunction.isInitialized) {
-                        response += this@LoginServer.handleFunction.invoke(line)
+            try {
+                socket.getInputStream().use { inputStream ->
+                    // read the first line of the HTTP request to get the authentication code
+                    val line = inputStream.bufferedReader().readLine()
+                    result = handleFunction.invoke(line)
+                    socket.getOutputStream().use { outputStream ->
+                        // handle the authentication code and generate a response HTML
+
+                        val response = """
+                                <html>
+                                    <body style="background-color: rgb(14,14,14); color: white;">
+                                        <style>
+                                            @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
+                                            body {
+                                                user-select: none;
+                                            }
+                                        </style> 
+                                        <div style="display: flex; height: 100%; justify-content: center; align-items: center; font-family: 'JetBrains Mono', monospace;">
+                                            <div style="background-color: rgb(10,10,10); display: flex; justify-content: center; align-items: center;">
+                                                <img style="padding:15px;"src="https://minotar.net/helm/${result.username}/100.png" width="30px" height="30px"/>
+                                                <p style="padding-right:15px;"> Welcome ${result.username}! </p>
+                                            </div>
+                                        </div>
+                                    </body>
+                                </html>
+                            """.trimIndent()
+
+                        // send the response to the client
+                        outputStream.write(
+                            ("HTTP/1.1 200 OK\r\n" + "Content-Type: text/html; charset=UTF-8\r\n" + "Content-Length: ${response.length}\r\n\r\n").toByteArray()
+                        )
+                        outputStream.write(response.toByteArray())
+                        outputStream.flush()
+                        socket.close()
                     }
-                    // Writes the response to the client.
-                    os.write(
-                        ("HTTP/1.1 200 OK\r\n" +
-                                "Content-Type: text/html; charset=UTF-8\r\n" +
-                                "Content-Length: ${response.length}\r\n\r\n")
-                            .toByteArray()
-                    )
-                    os.write(response.toByteArray())
-                    os.flush()
-                    os.close()
                 }
+            } catch (e: Exception) {
+                logger.error("Error processing incoming request: ${e.message}")
+            } finally {
+                socket.close()
             }
         }
-        return this
+        result
     }
 }
