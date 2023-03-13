@@ -29,7 +29,7 @@ It provides a simple way to login to Microsoft Account and then getting your Min
 
 ```groovy 
 repositories {
-	maven { url 'https://jitpack.io' }
+	maven { url 'https://repo.teaclient.dev' }
 }
 ```
 
@@ -45,7 +45,7 @@ dependencies {
 #### Including Repository
 ```kotlin 
 repositories {
-	maven("https://jitpack.io")
+	maven("https://repo.teaclient.dev")
 }
 ```
 
@@ -61,7 +61,7 @@ dependencies {
  <repositories>
 	<repository>
 		<id>jitpack.io</id>
-		<url>https://jitpack.io</url>
+		<url>https://repo.teaclient.dev</url>
 	</repostiory>
  </repostiories>
  <dependencies>

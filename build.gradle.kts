@@ -1,9 +1,10 @@
 plugins {
-   kotlin("jvm") version "1.7.21"
+    kotlin("jvm") version "1.7.21"
     id("org.jetbrains.dokka") version "1.6.10"
+    `maven-publish`
 }
 
-group = "tk.teaclient"
+group = "dev.teaclient"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -21,3 +22,26 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
 }
 
+val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets.getByName("main").allSource)
+}
+
+
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            groupId = group.toString()
+            artifactId = project.name.toString()
+            version = project.version.toString()
+
+            from(components["java"])
+            artifact(sourcesJar)
+
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}

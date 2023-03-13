@@ -95,13 +95,11 @@ class LoginServer(private val clientID: String, internal val port: Int = Random.
                         )
                         outputStream.write(response.toByteArray())
                         outputStream.flush()
-                        socket.close()
+                        serverSocket.close()
                     }
                 }
             } catch (e: Exception) {
                 logger.error("Error processing incoming request: ${e.message}")
-            } finally {
-                socket.close()
             }
         }
         result
