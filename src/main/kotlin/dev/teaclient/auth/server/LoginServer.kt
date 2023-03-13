@@ -15,11 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package tk.teaclient.auth.server
+package dev.teaclient.auth.server
 
-import tk.teaclient.auth.MinecraftSessionResult
-import tk.teaclient.auth.logger
-import tk.teaclient.auth.url
+import dev.teaclient.auth.MinecraftSessionResult
+import dev.teaclient.auth.logger
+import dev.teaclient.auth.url
 import java.awt.Desktop
 import java.net.ServerSocket
 import java.net.URL

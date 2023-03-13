@@ -17,16 +17,16 @@
 */
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package tk.teaclient.auth
+package dev.teaclient.auth
 
+import dev.teaclient.auth.HTTPUtils.get
+import dev.teaclient.auth.HTTPUtils.post
+import dev.teaclient.auth.jsonobjects.req.*
+import dev.teaclient.auth.jsonobjects.req.Properties
+import dev.teaclient.auth.jsonobjects.res.*
+import dev.teaclient.auth.server.LoginServer
+import dev.teaclient.auth.service.SessionChangerProvider
 import org.apache.logging.log4j.LogManager
-import tk.teaclient.auth.HTTPUtils.get
-import tk.teaclient.auth.HTTPUtils.post
-import tk.teaclient.auth.jsonobjects.req.*
-import tk.teaclient.auth.jsonobjects.req.Properties
-import tk.teaclient.auth.jsonobjects.res.*
-import tk.teaclient.auth.server.LoginServer
-import tk.teaclient.auth.service.SessionChangerProvider
 import java.util.*
 import java.util.concurrent.CompletableFuture
 

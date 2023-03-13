@@ -1,4 +1,4 @@
-package tk.teaclient.auth.jsonobjects.res
+package dev.teaclient.auth.jsonobjects.res
 
 import com.google.gson.annotations.SerializedName
 

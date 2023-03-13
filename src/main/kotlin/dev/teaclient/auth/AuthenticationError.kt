@@ -1,4 +1,4 @@
-package tk.teaclient.auth
+package dev.teaclient.auth
 
 /**
  * Exception class representing an error that occurred during authentication.

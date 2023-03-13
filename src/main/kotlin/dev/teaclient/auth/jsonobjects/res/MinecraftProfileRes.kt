@@ -1,6 +1,8 @@
-package tk.teaclient.auth.jsonobjects.res
+package dev.teaclient.auth.jsonobjects.res
 
 import com.google.gson.annotations.SerializedName
+import dev.teaclient.auth.jsonobjects.res.MinecraftProfileRes.Cape
+import dev.teaclient.auth.jsonobjects.res.MinecraftProfileRes.Skin
 
 /**
  * Response object containing Minecraft profile data.

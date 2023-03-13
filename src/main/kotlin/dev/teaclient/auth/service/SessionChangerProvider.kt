@@ -15,9 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package tk.teaclient.auth.service
+package dev.teaclient.auth.service
 
-import tk.teaclient.auth.MinecraftSessionResult
+import dev.teaclient.auth.MinecraftSessionResult
 
 /**
  * Defines an interface for classes that provide a way to change the current session

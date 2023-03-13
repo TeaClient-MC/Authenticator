@@ -1,4 +1,4 @@
-package tk.teaclient.auth
+package dev.teaclient.auth
 
 import com.google.gson.Gson
 import okhttp3.FormBody

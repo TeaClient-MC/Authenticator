@@ -36,7 +36,7 @@ repositories {
 #### Including Dependency
 ```groovy
 dependencies {
-	implementation 'tk.teaclient:Authenticator:version'
+	implementation 'dev.teaclient:Authenticator:version'
 }
 ```
  
@@ -52,7 +52,7 @@ repositories {
 #### Including Dependency
 ```kotlin
 dependencies {
-	implementation("tk.teaclient:Authenticator:version")
+	implementation("dev.teaclient:Authenticator:version")
 }
 ```
  
@@ -60,13 +60,13 @@ dependencies {
  ```xml
  <repositories>
 	<repository>
-		<id>jitpack.io</id>
+		<id>teaclient-repo</id>
 		<url>https://repo.teaclient.dev</url>
 	</repostiory>
  </repostiories>
  <dependencies>
 	<dependency>
-		<groupId>tk.teaclient</groupId>
+		<groupId>dev.teaclient</groupId>
 		<artifactId>Authenticator</artifactId>
 		<version>version</version>
 	</dependency>
@@ -175,7 +175,7 @@ Now go back to [Logging in to Minecraft](#logging-in-to-minecraft)
 You can use service to change session
 first create a file in
 
-`META-INF/services/tk.teaclient.auth.service.SessionChangerProvider`
+`META-INF/services/dev.teaclient.auth.service.SessionChangerProvider`
 
 if our class is `myclient.auth.SessionChangerImpl`
 

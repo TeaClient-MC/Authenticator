@@ -15,22 +15,14 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package tk.teaclient.auth
+package dev.teaclient.auth.jsonobjects.req
 
 import com.google.gson.annotations.SerializedName
-import java.util.*
 
 /**
- * Represents the result of a successful Minecraft authentication session.
- *
- * @property username The username of the authenticated user.
- * @property uuid The UUID of the authenticated user.
- * @property accessToken The access token of the authenticated user.
- * @property refreshToken The refresh token, used to get new access token.
+ * Data class representing a Minecraft login request object.
+ * @property identityToken The identity token for the user attempting to log in.
  */
-data class MinecraftSessionResult(
-    @SerializedName("username") val username: String,
-    @SerializedName("uuid") val uuid: UUID,
-    @SerializedName("accessToken") val accessToken: String,
-    @SerializedName("refreshToken") val refreshToken: String
+data class MinecraftReq(
+    @field:SerializedName("identityToken") val identityToken: String
 )

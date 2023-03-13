@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package tk.teaclient.auth.jsonobjects.req
+package dev.teaclient.auth.jsonobjects.req
 
 import com.google.gson.annotations.SerializedName
 
